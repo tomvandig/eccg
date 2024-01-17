@@ -1,3 +1,5 @@
+*This is WIP*
+
 # ECCG
 
 This document describes an **ECCG** (*Entity Component Composition Graph*), a variation on the **ECS** (*Entity Component System*) pattern that improves **data reuse** and **nested data composition** by *sacrificing certain aspects of data oriented design*. 
