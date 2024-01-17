@@ -178,4 +178,4 @@ If necessary, a stakeholder can identify an individual `Wall` as having addition
  Compose(Wall.WallType, IsExternal)
 ```
 
-Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without doing traversing or knowledge of the relationships on `Wall`.
+Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without traversing or knowledge of the relationships on `Wall`.
