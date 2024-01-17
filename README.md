@@ -27,6 +27,8 @@ Specifically in the AEC industry, there is a shift to apply ECS in the same mann
 
 The reference chasing that is prevented to support a **predictable memory layout** in game engines is much less relevant to the AEC industry and its webservices. So how can we combine the composition and data coupling elements of ECS with typing and inheritance?
 
+*Note: in all graphs we will use green for entities, blue for components*
+
 ```mermaid
 graph TD;
     A-->GeometryA;
@@ -90,8 +92,8 @@ By composing entities together, we effectively form a graph of composed entities
 
 ```mermaid
 graph TD;
-    A-->C;
-    B-->C;
+    A-.->C;
+    B-.->C;
 
     C-->Geometry;
     C-->Material;
@@ -117,7 +119,19 @@ If we apply the following composition:
  Compose(A, B) 
 ```
 
-// picture of compose graph
+```mermaid
+graph TD;
+    A-.->B;
+    
+    B-->Geometry;
+    B-->Location;
+
+    style A fill:#63c408
+    style B fill:#63c408
+
+    style Geometry fill:#08aec4
+    style Location fill:#08aec4
+```
 
 We have created two regular entities `A` and `B`. From the perspective of `A`, `B` is a **subentity**, but `B` is also a regular valid entity itself. 
 
@@ -132,9 +146,26 @@ However, is `A.B` a valid entity in the same way that `A` and `B` are? What happ
  Compose(A.B, Property) 
 ```
 
-// picture of compose graph
+```mermaid
+graph TD;
 
-This example shows the **virtual entity** `A.B` is itself a valid entity because it can operate as a new entity under a new identifier separate from `A` and `B`, and receive components itself.
+    A-.->B;
+
+    A.B-->Property
+    
+    A-->Location;
+    B-->Geometry;
+    
+    style A fill:#63c408
+    style B fill:#63c408
+    style A.B fill:#63c408,stroke-dasharray: 5 5
+
+    style Geometry fill:#08aec4
+    style Location fill:#08aec4
+    style Property fill:#08aec4
+```
+
+This example shows the **virtual entity** `A.B` is itself a valid entity because it can operate as a new entity under a new identifier separate from `A` and `B`, and can receive components itself.
 
 This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `E.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components.
 
