@@ -158,7 +158,7 @@ graph TD;
     
     style A fill:#63c408
     style B fill:#63c408
-    style A.B fill:#63c408,stroke-dasharray: 5 5
+    style A.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
 
     style Geometry fill:#08aec4
     style Location fill:#08aec4
@@ -186,7 +186,24 @@ If we again take the following example
  Compose(A.B, Property) 
 ```
 
-// picture of compose graph
+```mermaid
+graph TD;
+
+    A-.->B;
+
+    A.B-->Property
+    
+    A-->Location;
+    B-->Geometry;
+    
+    style A fill:#63c408
+    style B fill:#63c408
+    style A.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+
+    style Geometry fill:#08aec4
+    style Location fill:#08aec4
+    style Property fill:#08aec4
+```
 
 If we define an operation `Query(e)` that returns all components of entity `e`, and `Query(e.*)` that returns all components of the entire composition graph with root at `e`, we expect the following behavior:
 
@@ -249,6 +266,23 @@ Give a wall a type, the wall is in a specific place while the type defines geome
  Compose(Wall, WallType)
 ```
 
+
+```mermaid
+graph TD;
+
+    Wall-.->WallType;
+
+    Wall-->Placement
+    
+    WallType-->Geometry;
+    
+    style Wall fill:#63c408
+    style WallType fill:#63c408
+
+    style Geometry fill:#08aec4
+    style Placement fill:#08aec4
+```
+
 Querying the wall through `Query(Wall.*)` will return the `Geometry` and `Placement` both, allowing a viewer to visualize the wall at the correct location. 
 
 Furthermore, another stakeholder may augment the `WallType` with some property
@@ -257,12 +291,54 @@ Furthermore, another stakeholder may augment the `WallType` with some property
  Compose(WallType, FireRating)
 ```
 
+```mermaid
+graph TD;
+
+    Wall-.->WallType;
+
+    Wall-->Placement
+    
+    WallType-->Geometry;
+    WallType-->FireRating;
+    
+    style Wall fill:#63c408
+    style WallType fill:#63c408
+
+    style Geometry fill:#08aec4
+    style Placement fill:#08aec4
+    style FireRating fill:#08aec4,stroke-width:4px
+```
+
 Without having to modify individual `Wall` entities, or even without having to know about any existing `Wall` entities.
 
 If necessary, a stakeholder can identify an individual `Wall` as having additional data associated with its type that does not apply to all walls of that type.
 
 ```
  Compose(Wall.WallType, IsExternal)
+```
+
+```mermaid
+graph TD;
+
+    Wall-.->WallType;
+
+    Wall-->Placement
+
+    Wall.WallType-->IsExternal
+
+    
+    WallType-->Geometry;
+    WallType-->FireRating;
+    
+    style Wall fill:#63c408
+    style WallType fill:#63c408
+    style Wall.WallType fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+
+    style Geometry fill:#08aec4
+    style Placement fill:#08aec4
+    style FireRating fill:#08aec4
+    style IsExternal fill:#08aec4,stroke-width:4px
+
 ```
 
 Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without traversing or knowledge of the relationships on `Wall`.
