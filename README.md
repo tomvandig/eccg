@@ -40,6 +40,9 @@ graph TD;
     style B fill:#63c408
 
     style GeometryA fill:#08aec4
+    style GeometryB fill:#08aec4
+    style MaterialA fill:#08aec4
+    style MaterialB fill:#08aec4
 ```
 *Typing through duplication*
 
@@ -57,6 +60,11 @@ graph TD;
     style A fill:#63c408
     style B fill:#63c408
     style Type fill:#63c408
+
+    style TypeA fill:#08aec4
+    style TypeB fill:#08aec4
+    style Geometry fill:#08aec4
+    style Material fill:#08aec4
 ```
 *Typing through relationships*
 
@@ -82,9 +90,18 @@ By composing entities together, we effectively form a graph of composed entities
 
 ```mermaid
 graph TD;
-    A-->B;
-    A-->D;
+    A-->C;
     B-->C;
+
+    C-->Geometry;
+    C-->Material;
+
+    style A fill:#63c408
+    style B fill:#63c408
+    style C fill:#63c408
+
+    style Geometry fill:#08aec4
+    style Material fill:#08aec4
 ```
 *Entity Compose graph*
 
