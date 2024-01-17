@@ -36,14 +36,8 @@ graph TD;
     B-->MaterialB;
     
     
-    style A fill:#1ba842
+    style A fill:#22a81b
     style B fill:#1ba842
-
-    style GeometryA fill: #1b45a8
-    style GeometryB fill: #1b45a8
-    style MaterialA fill: #1b45a8
-    style MaterialB fill: #1b45a8
-
 ```
 *Typing through duplication*
 
@@ -60,13 +54,7 @@ graph TD;
     
     style A fill:#1ba842
     style B fill:#1ba842
-    style Type fill:#1ba842
-
-    style TypeA fill: #1b45a8
-    style TypeB fill: #1b45a8
-
-    style Geometry fill: #1b45a8
-    style Material fill: #1b45a8
+    style Type fill:#63c408
 ```
 *Typing through relationships*
 
