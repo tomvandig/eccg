@@ -150,7 +150,7 @@ So far the described composition behavior did not include relationships: compone
 
 Some work must be done on the client side to properly interpret a relationship if it falls completely inside of a compose graph (case 2 above), or on the ECCG side to return rewritten relationships when part of a virtual entity. This is not particularly difficult in practice though. 
 
-# Type systems in EC
+# Type systems in ECCG
 
 This was a lot of theoretical operations, so now we can show how these operations can be combined to express common patterns that are hard to express in ECS.
 
