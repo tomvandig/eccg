@@ -154,6 +154,28 @@ Some work must be done on the client side to properly interpret a relationship i
 
 This was a lot of theoretical operations, so now we can show how these operations can be combined to express common patterns that are hard to express in ECS.
 
+Give a wall a type, the wall is in a specific place while the type defines geometry:
 
+```
+ Compose(Wall, Placement)
+ Compose(WallType, Geometry)
+ Compose(Wall, WallType)
+```
 
-Typing, data reuse, component identification
+Querying the wall through `Query(Wall.*)` will return the `Geometry` and `Placement` both, allowing a viewer to visualize the wall at the correct location. 
+
+Furthermore, another stakeholder may augment the `WallType` with some property
+
+```
+ Compose(WallType, FireRating)
+```
+
+Without having to modify individual `Wall` entities, or even without having to know about any existing `Wall` entities.
+
+If necessary, a stakeholder can identify an individual `Wall` as having additional data associated with its type that does not apply to all walls of that type.
+
+```
+ Compose(Wall.WallType, IsExternal)
+```
+
+Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without doing traversing or knowledge of the relationships on `Wall`.
