@@ -1,6 +1,8 @@
 # ECCG
 
-An **ECCG** (*Entity Component Composition Graph*) is a variation on the **ECS** (*Entity Component System*) pattern that improves data reuse and nested data composition.
+This document describes an **ECCG** (*Entity Component Composition Graph*), a variation on the **ECS** (*Entity Component System*) pattern that improves **data reuse** and **nested data composition** by *sacrificing certain aspects of data oriented design*. 
+
+It is likely that this structure exists already under a different name or in a nameless way in proprietary implementations, but I have not found any descriptions online.
 
 An ECCG *could be* a good fit if:
 
@@ -78,7 +80,7 @@ However, is `A.B` a valid entity in the same way that `A` and `B` are? What happ
 
 This example shows the **virtual entity** `A.B` is itself a valid entity because it can operate as a new entity under a new identifier separate from `A` and `B`, and receive components itself.
 
-Naturally, this behavior can be nested further into the graph.
+This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `E.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components.
 
 # Virtual entity lifecycle
 
@@ -134,14 +136,24 @@ Similarly, if we define an operation `Query(c)` that returns all entities with c
     [B, A.B]
 ```
 
-Note that `A` is not returned for `Property` and `Geometry` because we know that `A` is involved through `A.B`.
+Note that `A` is not returned for `Property` and `Geometry` because we know that `A` is involved through `A.B`. If `A` directly composed `Property` it should also be returned.
 
 These query results show that entity composition extends component composition in a natural way for the client interacting with the ECCG.
 
 # Relationships
 
-Relationships inside and outside the compose subgraph
+So far the described composition behavior did not include relationships: components that reference another entity ID. Luckily this works out without a lot of issues. We can distinguish three cases:
+
+1. The relationship points **from inside to outside** the compose graph. In this case the relationship works as any relationship in a traditional ECS.
+2. The relationship points **from inside to inside** the compose graph. In this case the relationship can be interpreted to link virtual entities together when viewed through the context of the parent entity. E.g a relationship pointing to `B` points to `A.B` when viewed from `A`.
+3. The relationship points **from outside to inside** the compose graph, in this case the relationship can simply use the entity ID path to express this. E.g pointing to `A.B` rather than `B` itself.
+
+Some work must be done on the client side to properly interpret a relationship if it falls completely inside of a compose graph (case 2 above), or on the ECCG side to return rewritten relationships when part of a virtual entity. This is not particularly difficult in practice though. 
 
 # Type systems in EC
+
+This was a lot of theoretical operations, so now we can show how these operations can be combined to express common patterns that are hard to express in ECS.
+
+
 
 Typing, data reuse, component identification
