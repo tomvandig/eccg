@@ -27,7 +27,48 @@ Specifically in the AEC industry, there is a shift to apply ECS in the same mann
 
 The reference chasing that is prevented to support a **predictable memory layout** in game engines is much less relevant to the AEC industry and its webservices. So how can we combine the composition and data coupling elements of ECS with typing and inheritance?
 
-// picture of typing/inheritance in a traditional ECS
+```mermaid
+graph TD;
+    A-->GeometryA;
+    A-->MaterialA;
+
+    B-->GeometryB;
+    B-->MaterialB;
+    
+    
+    style A fill:#1ba842
+    style B fill:#1ba842
+
+    style GeometryA fill: #1b45a8
+    style GeometryB fill: #1b45a8
+    style MaterialA fill: #1b45a8
+    style MaterialB fill: #1b45a8
+
+```
+*Typing through duplication*
+
+```mermaid
+graph TD;
+    A-->TypeA;
+    B-->TypeB;
+
+    TypeA-->Type
+    TypeB-->Type
+
+    Type-->Geometry;
+    Type-->Material;
+    
+    style A fill:#1ba842
+    style B fill:#1ba842
+    style Type fill:#1ba842
+
+    style TypeA fill: #1b45a8
+    style TypeB fill: #1b45a8
+
+    style Geometry fill: #1b45a8
+    style Material fill: #1b45a8
+```
+*Typing through relationships*
 
 It turns out we can do a better job, by taking another look at composition.
 
@@ -49,7 +90,13 @@ Looking at this operation, you could wonder what happens if we do:
 
 By composing entities together, we effectively form a graph of composed entities and components. Lets call this the *compose graph*. The *compose graph* can be used to derive new functionality from the ECS, transforming it into an ECCG.
 
-// picture of a compose graph
+```mermaid
+graph TD;
+    A-->B;
+    A-->D;
+    B-->C;
+```
+*Entity Compose graph*
 
 This graph does not feel fundamentally different than simple entity to entity relationships, but because entity composition is built into the system we can treat it in a special way to get new behavior.
 
