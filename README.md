@@ -131,11 +131,13 @@ graph TD;
 
     style Geometry fill:#08aec4
     style Location fill:#08aec4
+    style A.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+
 ```
 
-We have created two regular entities `A` and `B`. From the perspective of `A`, `B` is a **subentity**, but `B` is also a regular valid entity itself. 
+We have created two regular entities `A` and `B`. From the perspective of `A`, entity `B` is a **subentity**, but `B` is also a regular valid entity itself. 
 
-We have also created an additional entity which we can identify as `A.B`, we call this a **virtual entity**. It is virtual in the sense that it is not explicitly created but arises from the composition.
+Additionally a new entity is created implicitly which we can identify as `A.B`, we call this a **virtual entity**. It is virtual in the sense that it is not explicitly created but arises from the composition.
 
 However, is `A.B` a valid entity in the same way that `A` and `B` are? What happens if we compose a component on `A.B`?
 
@@ -165,9 +167,34 @@ graph TD;
     style Property fill:#08aec4
 ```
 
-This example shows the **virtual entity** `A.B` is itself a valid entity because it can operate as a new entity under a new identifier separate from `A` and `B`, and can receive components itself.
+This example shows the **virtual entity** `A.B` is itself a valid entity in the sense that it can operate as a new entity under a new identifier separate from `A` and `B`, and can receive components itself.
 
-This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `E.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components.
+This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `C.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components. This is where it becomes necessary to use the full "name" of the virtual entity to identify it, we call this the **entity path**.
+
+```mermaid
+graph TD;
+
+    A-.->B;
+    C-.->B;
+
+    A.B-->PropertyA
+    C.B-->PropertyC
+    
+    A-->Location;
+    B-->Geometry;
+    
+    style A fill:#63c408
+    style B fill:#63c408
+    style C fill:#63c408
+    style A.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+    style C.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+
+    style Geometry fill:#08aec4
+    style Location fill:#08aec4
+    style PropertyA fill:#08aec4
+    style PropertyC fill:#08aec4
+```
+*Example with multiple entities sharing a subentity*
 
 # Virtual entity lifecycle
 
@@ -244,7 +271,7 @@ Note that `A` is not returned for `Property` and `Geometry` because we know that
 
 These query results show that entity composition extends component composition in a natural way for the client interacting with the ECCG.
 
-# Relationships
+# Relationships and the Compose graph
 
 So far the described composition behavior did not include relationships: components that reference another entity ID. Luckily this works out without a lot of issues. We can distinguish three cases:
 
@@ -253,6 +280,41 @@ So far the described composition behavior did not include relationships: compone
 3. The relationship points **from outside to inside** the compose graph, in this case the relationship can simply use the entity ID path to express this. E.g pointing to `A.B` rather than `B` itself.
 
 Some work must be done on the client side to properly interpret a relationship if it falls completely inside of a compose graph (case 2 above), or on the ECCG side to return rewritten relationships when part of a virtual entity. This is not particularly difficult in practice though. 
+
+## Ownership and relationships
+
+When sharing ownership over entities and their components, its often necessary for many stakeholders to apply the same type of relationships to an entity. However, if this is the same relationship component having multiple entities it relates to, this creates an issue where stakeholders must agree on the same data. 
+
+A solution is to allow multiple components of the same type, each component representing a single relationship, each stakeholder owning only the components it creates. This works for collaboration but creates a new problem of identification, if an entity has 5 components of the same type, how can we form a relationship to such a component?
+
+The subentity and compose graph solution means keeping the single component type per entity requirement, and using subentities to scope and identify the relationships.
+
+# Overrides
+
+The single component type per entity also allows us to derive another nice quality of the compose graph: overrides.
+
+```mermaid
+graph TD;
+
+    A-.->B;
+
+    A.B-->GeometryOverride
+    
+    A-->Location;
+    B-->Geometry;
+    
+    style A fill:#63c408
+    style B fill:#63c408
+    style A.B fill:#63c408,stroke-dasharray: 5 5,stroke-width:4px
+
+    style Geometry fill:#08aec4
+    style Location fill:#08aec4
+    style GeometryOverride fill:#08aec4;
+```
+
+The client can conclude when `A.B.GeometryOverride` should take precedence over `B.Geometry` since depending on the query it is "more specific". When querying `B`, `GeometryOverride` is not considered as it is not in the compose graph of `B`. However when querying `A` it can be concluded that `A.B` has precedence over `B` from the perspective of `A`.
+
+This way, a type can be implemented and partially overridden in edge cases where this is necessary, while retaining shared ownership.
 
 # Type systems in ECCG
 
@@ -342,3 +404,8 @@ graph TD;
 ```
 
 Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without traversing or knowledge of the relationships on `Wall`.
+
+
+// querying composed entities through subentity
+
+// 
