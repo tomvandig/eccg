@@ -118,9 +118,9 @@ graph TD;
     style Geometry fill:#08aec4
     style Material fill:#08aec4
 ```
-*Entity Compose graph*
+*An Entity Compose graph*
 
-This graph does not feel fundamentally different than simple entity to entity relationships, but because entity composition is built into the system we can treat it in a special way to get new behavior.
+This graph does not feel fundamentally different than simple entity to entity relationships, but because entity composition is built into the system as a special type of connection we can treat it in a special way to get new behavior.
 
 # Subentities
 
