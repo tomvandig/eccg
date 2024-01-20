@@ -21,11 +21,11 @@ This document describes the rationale and workings of an ECCG.
 
 Invented in the gaming industry, an ECS is an ideal way to decouple different data structures and users of data types while still operating on a shared set of elements. Typically in a game engine your players or enemies might be entities, while your geometry, location and materials data might be stored in components. The ECS approach provides two main benefits over inheritance based approaches: **decoupling** and **predictable memory layout**, these are perfect for complex game engines with many systems working on the same objects, and a need for high performance.
 
-Recently though, ECS systems have been applied in a different way inside of (collections of) web services. Particularly in large companies, having a single data definition of an object results in incredibly complex data structures that are hard to evolve and manage,  because that one object must support all use cases. In such a setting an ECS can be applied to decouple systems and more easily share data, each service operates on specific subparts of data it knows but together the system can work on objects with a single identifier.
+Recently though, ECS systems have been applied in a different way inside of (collections of) web services. Particularly in large companies, having a single data definition of an object results in incredibly complex data structures that are hard to evolve and manage,  because that one object must support all use cases. In such a setting an ECS can be applied to decouple systems and more easily share data, each service operates on specific subparts of data it knows but together the system can work on objects with a single identifier. One field where this is happening is in the AEC industry.
 
-Specifically in the AEC industry, there is a shift to apply ECS in the same manner, taking advantage of the **decoupling** to share ownership of entities between many stakeholders and compose the data of an entity collaboratively. An issue that arises here is that AEC data is very reliant on data sharing through inheritance and typing, while an ECS is more focussed on reducing reference chasing through duplication and composition. 
+Specifically the AEC industry is taking advantage of the **decoupling** of ECS to share ownership of entities between many stakeholders and compose the data of an entity collaboratively. What these new applications care less about is achieving high performance through a **predictable memory layout**, in practice this means that avoiding reference chasing does not have to be a primary goal of ECS in AEC. 
 
-The reference chasing that is prevented to support a **predictable memory layout** in game engines is much less relevant to the AEC industry and its webservices. So how can we combine the composition and data coupling elements of ECS with typing and inheritance?
+An new requirement that arises in AEC data is the reliance on data sharing through inheritance and typing, while an ECS is more focussed on reducing reference chasing through duplication and composition. We can see this in the following two examples:
 
 *Note: in all graphs we will use green for entities, blue for components*
 
@@ -46,7 +46,7 @@ graph TD;
     style MaterialA fill:#08aec4
     style MaterialB fill:#08aec4
 ```
-*Typing through duplication*
+*Typing through duplication: the ecs can be queried in a natural way, but its unclear which type an object belongs to, and no data is shared*
 
 ```mermaid
 graph TD;
@@ -68,9 +68,9 @@ graph TD;
     style Geometry fill:#08aec4
     style Material fill:#08aec4
 ```
-*Typing through relationships*
+*Typing through relationships: its clear which type the object belongs to, data is shared, but querying objects through components returns types instead of instances*
 
-It turns out we can do a better job, by taking another look at composition.
+How can we improve on the typing capabilities in an ECS shown above, by using the different requirements that AEC puts on its ECS data?
 
 # Composition graph
 
