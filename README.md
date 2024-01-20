@@ -68,9 +68,11 @@ graph TD;
     style Geometry fill:#08aec4
     style Material fill:#08aec4
 ```
-*Typing through relationships: its clear which type the object belongs to, data is shared, but querying objects through components returns types instead of instances*
+*Typing through relationships: its clear which type the object belongs to, data is shared but not hierarchically, and querying objects through components returns types instead of instances, causing reference chasing on the client*
 
-How can we improve on the typing capabilities in an ECS shown above, by using the different requirements that AEC puts on its ECS data?
+How can we improve on the typing capabilities in an ECS shown above, by taking advantage of the different requirements that AEC puts on its ECS data?
+
+We can improve by taking another look at composition.
 
 # Composition graph
 
