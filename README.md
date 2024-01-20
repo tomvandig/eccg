@@ -122,7 +122,7 @@ graph TD;
 
 This graph does not feel fundamentally different than simple entity to entity relationships, but because entity composition is built into the system as a special type of connection we can treat it in a special way to get new behavior.
 
-# Subentities
+# Sub- and virtual entities
 
 If we apply the following composition:
 
@@ -148,9 +148,9 @@ graph TD;
 
 ```
 
-We have created two regular entities `A` and `B`. From the perspective of `A`, entity `B` is a **subentity**, but `B` is also a regular valid entity itself. 
+We have created two regular entities `A` and `B`. From the perspective of `A`, entity `B` is a **subentity**, but `B` is also a valid entity itself. 
 
-Additionally a new entity is created implicitly which we can identify as `A.B`, we call this a **virtual entity**. It is virtual in the sense that it is not explicitly created but arises from the composition.
+Additionally a new entity is created implicitly which we can identify as `A.B`, we call this a **virtual entity**. It is virtual in the sense that it is not explicitly created but arises from the composition of `A` and `B`.
 
 However, is `A.B` a valid entity in the same way that `A` and `B` are? What happens if we compose a component on `A.B`?
 
@@ -182,7 +182,7 @@ graph TD;
 
 This example shows the **virtual entity** `A.B` is itself a valid entity in the sense that it can operate as a new entity under a new identifier separate from `A` and `B`, and can receive components itself.
 
-This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `C.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components. This is where it becomes necessary to use the full "name" of the virtual entity to identify it, we call this the **entity path**.
+This behavior can be nested further into the graph to form `A.B.C` or the graph can support multiple parents: `A.B` and `C.B` are both virtual entities that share the same data composed from `B` but can additionally receive their own specific components. This is where it becomes necessary to use the "full name" of the virtual entity to identify it, we call this the **entity path**.
 
 ```mermaid
 graph TD;
