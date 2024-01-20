@@ -70,9 +70,20 @@ graph TD;
 ```
 *Typing through relationships: its clear which type the object belongs to, data is shared but not hierarchically, and querying objects through components returns types instead of instances, causing reference chasing on the client*
 
-How can we improve on the typing capabilities in an ECS shown above, by taking advantage of the different requirements that AEC puts on its ECS data?
+How can we improve on the typing capabilities in an ECS shown above, by taking advantage of the different requirements that AEC puts on its data? 
 
-We can improve by taking another look at composition.
+Specifically what we want from our ECS is:
+* decoupling and shared ownership
+* data composition
+* normal ECS query behavior
+* identifiable types
+* data sharing
+
+Meanwhile we don't need to consider:
+* memory layout
+* reference chasing
+
+To find a sweet spot that balances these requirements, we need to take another look at composition.
 
 # Composition graph
 
@@ -86,11 +97,11 @@ For instance, in the AEC sector we would say:
 
 Removing it could similary be done with a *decompose* operation.
 
-Looking at this operation, you could wonder what happens if we do:
+Defining the operation like this invites the question what would happen if we do:
 
 ``` Compose(entity, otherEntity) ```
 
-By composing entities together, we effectively form a graph of composed entities and components. Lets call this the *compose graph*. The *compose graph* can be used to derive new functionality from the ECS, transforming it into an ECCG.
+By composing entities together like this we can imagine a graph is formed of composed entities and components. Lets call this the *compose graph*. The *compose graph* can be used to derive new functionality from the ECS. The compose graph, in combination with the ECS, from an ECCG.
 
 ```mermaid
 graph TD;
