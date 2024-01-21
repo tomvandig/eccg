@@ -68,7 +68,7 @@ export class eccg
             prevCompose.forEach(element => {
                 if (element.isEntity)
                 {
-                    result = [...result, ...this.Query(MakeEntity(`${prev}.${element.name}`))];
+                    result = [...result, ...this.Query(MakeEntity(`${prev}.${element.name}.*`))];
                     result.push(element);
                 }
                 else
