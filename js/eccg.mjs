@@ -57,8 +57,10 @@ export class eccg
 
         if (last === "*")
         {
+            let tail = parts.slice(0, parts.length - 1).join(".");
             let prev = parts[parts.length - 2];
-            let prevCompose = this.QueryEntity(prev);
+            let prevCompose = prev == tail ? this.QueryEntity(prev)
+                            : [...this.QueryEntity(prev), ...this.QueryEntity(tail)];
 
             console.log(`expand...`);
             let result = [];
@@ -67,19 +69,18 @@ export class eccg
                 if (element.isEntity)
                 {
                     result = [...result, ...this.Query(MakeEntity(`${prev}.${element.name}`))];
+                    result.push(element);
+                }
+                else
+                {
+                    result.push(element);
                 }
             });
 
-            let tail = parts.slice(0, parts.length - 1).join(".");
-            result = [...result, ...this.Query(MakeEntity(tail))];
-            
             console.log(`...end expand`);
-
 
             return result;
         }
-
-        let tail = parts.slice(0, parts.length - 1).join(".");
 
         return [...this.QueryEntity(last), ...this.QueryEntity(entity.name)];
     }
