@@ -302,7 +302,7 @@ A solution is to allow multiple components of the same type, each component repr
 
 The subentity and compose graph solution means keeping the single component type per entity requirement, and using subentities to scope and identify the relationships.
 
-# Overrides
+# Overrides and defaults
 
 The single component type per entity also allows us to derive another nice quality of the compose graph: overrides.
 
@@ -328,6 +328,8 @@ graph TD;
 The client can conclude when `A.B.GeometryOverride` should take precedence over `B.Geometry` since depending on the query it is "more specific". When querying `B`, `GeometryOverride` is not considered as it is not in the compose graph of `B`. However when querying `A` it can be concluded that `A.B` has precedence over `B` from the perspective of `A`.
 
 This way, a type can be implemented and partially overridden in edge cases where this is necessary, while retaining shared ownership.
+
+Similarly, one can think of a component that is NOT overridden as a guaranteed "default value". Hence you can think of a type not just as a concrete type but also as an arbitrary, to be filled in, set of components on an entity.
 
 # Type systems in ECCG
 
@@ -418,6 +420,34 @@ graph TD;
 
 Another stakeholder looking for external walls would then find `Wall.WallType` through `Query(IsExternal)` and understand that `Wall` is an external wall without traversing or knowledge of the relationships on `Wall`.
 
+
+# Archetypes
+
+```mermaid
+graph TD;
+
+
+    WallArchetype-->Classification
+    WallArchetype-->Geometry
+
+    WallType-.->WallArchetype
+    WallType-->ExternalWallGeometry
+
+
+    Wall-.->WallType;
+
+    Wall-->Placement
+
+    style Wall fill:#63c408
+    style WallType fill:#63c408
+    style WallArchetype fill:#63c408
+
+    style Geometry fill:#08aec4
+    style ExternalWallGeometry fill:#08aec4
+    style Placement fill:#08aec4
+    style Classification fill:#08aec4
+
+```
 
 // querying composed entities through subentity
 
