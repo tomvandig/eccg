@@ -69,4 +69,25 @@ function test3()
     console.log(repo.Query(MakeComponent("Property")));
 }
 
-test3();
+function testaec()
+{
+    let repo = new eccg();
+
+    let SpaceHeater1 = MakeEntity("SpaceHeater1");
+    let ConvectionHeater = MakeEntity("ConvectionHeater");
+    let EnergyTransferArchetype = MakeEntity("EnergyTransferArchetype");
+
+    let Name = MakeComponent("Name", "SpaceHeater1");
+    let HeatingCoefficient = MakeComponent("HeatingCoefficient", "382 mg/s");
+
+    repo.Compose(EnergyTransferArchetype, HeatingCoefficient);
+    repo.Compose(SpaceHeater1, Name);
+
+    repo.Compose(SpaceHeater1, ConvectionHeater);
+    repo.Compose(ConvectionHeater, EnergyTransferArchetype);
+
+    console.log(repo.Query(MakeComponent("HeatingCoefficient")));
+    console.log(repo.Query(MakeEntity("SpaceHeater1.*")));
+}
+
+testaec();

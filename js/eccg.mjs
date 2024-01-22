@@ -89,7 +89,7 @@ export class eccg
             prevCompose.forEach(element => {
                 if (element.isEntity)
                 {
-                    result = [...result, ...this.Query(MakeEntity(`${prev}.${element.name}.*`))];
+                    result = [...result, ...this.QueryEntity(MakeEntity(`${prev}.${element.name}.*`))];
                     result.push(element);
                 }
                 else
@@ -125,6 +125,8 @@ export class eccg
     QueryComponent(component)
     {
         let directSet = this.componentTypeToEntity[component.name];
+
+        if (!directSet) return [];
 
         let result = [];
 
