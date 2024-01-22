@@ -57,53 +57,54 @@ export class eccg
         }
     }
 
-    ShallowQueryEntity(name)
+    ShallowQueryEntity(name, path)
     {
-        console.log(`query entity ${name}`);
+        console.log(`query shallow entity ${name}`);
         let result = this.composeGraph[name];
-        return result ? result : [];
+        return result ? result.map((obj) => { return { entity: path, composedObject: obj}; }) : [];
     }
 
-    QueryEntity(entity)
+    QueryEntity(entity, path, recursive)
     {
-        console.log(`query ${entity.name}`);
+        console.log(`query entity ${entity.name} ${recursive ? "recursive" : ""}`);
         let parts = entity.name.split(".");
 
-        if (parts.length === 1)
+        let singlePart = parts.length === 1;
+
+        let main = parts[parts.length - 1];
+        let secondary = parts.join(".");
+
+        let shallowEntities = this.ShallowQueryEntity(main, path);
+
+        if (!singlePart)
         {
-            return this.ShallowQueryEntity(parts[0]);
+            let secondaryShallow = this.ShallowQueryEntity(secondary, path);
+            shallowEntities = [...shallowEntities, ...secondaryShallow];
         }
 
-        let last = parts[parts.length - 1];
-
-        if (last === "*")
+        if (!recursive)
         {
-            let tail = parts.slice(0, parts.length - 1).join(".");
-            let prev = parts[parts.length - 2];
-            let prevCompose = prev == tail ? this.ShallowQueryEntity(prev)
-                            : [...this.ShallowQueryEntity(prev), ...this.ShallowQueryEntity(tail)];
-
-            console.log(`expand...`);
-            let result = [];
-
-            prevCompose.forEach(element => {
-                if (element.isEntity)
-                {
-                    result = [...result, ...this.QueryEntity(MakeEntity(`${prev}.${element.name}.*`))];
-                    result.push(element);
-                }
-                else
-                {
-                    result.push(element);
-                }
-            });
-
-            console.log(`...end expand`);
-
-            return result;
+            return shallowEntities;
         }
 
-        return [...this.ShallowQueryEntity(last), ...this.ShallowQueryEntity(entity.name)];
+        let result = [];
+
+        console.log(`expand...`);
+        shallowEntities.forEach(element => {
+            if (element.composedObject.isEntity)
+            {
+                let virtual = MakeEntity(`${element.entity}.${element.composedObject.name}`);
+                result = [...result, ...this.QueryEntity(virtual, this.StripQueryWildCard(virtual.name), recursive)];
+                result.push(element);
+            }
+            else
+            {
+                result.push(element);
+            }
+        });
+        console.log(`...end expand`);
+
+        return result;
     }
 
     FindAllParentsInComposeGraph(entity, entityPath, result)
@@ -140,11 +141,18 @@ export class eccg
         return result;
     }
 
+    StripQueryWildCard(name)
+    {
+        return name.split(".").filter(e => e !== "*").join(".")
+    }
+
     Query(obj)
     {
         if (obj.isEntity)
         {
-            return this.QueryEntity(obj);
+            let stripped = this.StripQueryWildCard(obj.name);
+            let recursive = stripped.split(".").length !== obj.name.split(".").length;
+            return this.QueryEntity(MakeEntity(stripped), stripped, recursive);
         }
         else if (obj.isComponent)
         {

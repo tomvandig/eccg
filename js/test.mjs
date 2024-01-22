@@ -88,6 +88,7 @@ function testaec()
 
     console.log(repo.Query(MakeComponent("HeatingCoefficient")));
     console.log(repo.Query(MakeEntity("SpaceHeater1.*")));
+    console.log(repo.Query(MakeEntity("SpaceHeater1.ConvectionHeater.EnergyTransferArchetype.*")));
 }
 
 testaec();

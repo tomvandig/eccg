@@ -127,7 +127,7 @@ This graph does not feel fundamentally different than simple entity to entity re
 If we apply the following composition:
 
 ``` 
- Compose(A, Location)
+ Compose(B, Location)
  Compose(B, Geometry) 
  Compose(A, B) 
 ```
