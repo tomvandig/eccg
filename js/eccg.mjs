@@ -74,37 +74,31 @@ export class eccg
         let main = parts[parts.length - 1];
         let secondary = parts.join(".");
 
-        let shallowEntities = this.ShallowQueryEntity(main, path);
+        let results = this.ShallowQueryEntity(main, path);
 
         if (!singlePart)
         {
             let secondaryShallow = this.ShallowQueryEntity(secondary, path);
-            shallowEntities = [...shallowEntities, ...secondaryShallow];
+            results.push(...secondaryShallow);
         }
 
-        if (!recursive)
+        if (recursive)
         {
-            return shallowEntities;
+            console.log(`expand...`);
+            let resultsCpy = [...results];
+            resultsCpy.forEach(element => {
+                if (element.composedObject.isEntity)
+                {
+                    let virtual = MakeEntity(`${element.entity}.${element.composedObject.name}`);
+                    let virtualResults = this.QueryEntity(virtual, virtual.name, true);
+                    
+                    results.push(...virtualResults);
+                }
+            });
+            console.log(`...end expand`);
         }
 
-        let result = [];
-
-        console.log(`expand...`);
-        shallowEntities.forEach(element => {
-            if (element.composedObject.isEntity)
-            {
-                let virtual = MakeEntity(`${element.entity}.${element.composedObject.name}`);
-                result = [...result, ...this.QueryEntity(virtual, this.StripQueryWildCard(virtual.name), recursive)];
-                result.push(element);
-            }
-            else
-            {
-                result.push(element);
-            }
-        });
-        console.log(`...end expand`);
-
-        return result;
+        return results;
     }
 
     FindAllParentsInComposeGraph(entity, entityPath, result)
