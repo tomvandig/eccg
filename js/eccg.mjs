@@ -19,6 +19,8 @@ export function MakeComponent(name, value)
 export class eccg
 {
     composeGraph = {};
+    invComposeGraph = {};
+    componentTypeToEntity = {};
 
     Compose(entity, object)
     {
@@ -29,6 +31,25 @@ export class eccg
                 this.composeGraph[entity.name] = [];
             }
             this.composeGraph[entity.name].push(object);
+
+            if (object.isEntity)
+            {
+                if (!this.invComposeGraph[object.name])
+                {
+                    this.invComposeGraph[object.name] = [];
+                }
+
+                this.invComposeGraph[object.name].push(entity.name);
+            }
+
+            if (object.isComponent)
+            {
+                if (!this.componentTypeToEntity[object.name])
+                {
+                    this.componentTypeToEntity[object.name] = [];
+                }
+                this.componentTypeToEntity[object.name].push(entity.name);
+            }
         }
         else
         {
@@ -36,21 +57,21 @@ export class eccg
         }
     }
 
-    QueryEntity(name)
+    ShallowQueryEntity(name)
     {
         console.log(`query entity ${name}`);
         let result = this.composeGraph[name];
         return result ? result : [];
     }
 
-    Query(entity)
+    QueryEntity(entity)
     {
         console.log(`query ${entity.name}`);
         let parts = entity.name.split(".");
 
         if (parts.length === 1)
         {
-            return this.QueryEntity(parts[0]);
+            return this.ShallowQueryEntity(parts[0]);
         }
 
         let last = parts[parts.length - 1];
@@ -59,8 +80,8 @@ export class eccg
         {
             let tail = parts.slice(0, parts.length - 1).join(".");
             let prev = parts[parts.length - 2];
-            let prevCompose = prev == tail ? this.QueryEntity(prev)
-                            : [...this.QueryEntity(prev), ...this.QueryEntity(tail)];
+            let prevCompose = prev == tail ? this.ShallowQueryEntity(prev)
+                            : [...this.ShallowQueryEntity(prev), ...this.ShallowQueryEntity(tail)];
 
             console.log(`expand...`);
             let result = [];
@@ -82,6 +103,54 @@ export class eccg
             return result;
         }
 
-        return [...this.QueryEntity(last), ...this.QueryEntity(entity.name)];
+        return [...this.ShallowQueryEntity(last), ...this.ShallowQueryEntity(entity.name)];
+    }
+
+    FindAllParentsInComposeGraph(entity, entityPath, result)
+    {
+        result.push(entityPath);
+
+        let invSet = this.invComposeGraph[entity];
+
+        if (invSet)
+        {
+            invSet.forEach((inv) => {
+                let virtual = `${inv}.${entityPath}`;
+
+                this.FindAllParentsInComposeGraph(inv, virtual, result)
+            })
+        }
+    }
+
+    QueryComponent(component)
+    {
+        let directSet = this.componentTypeToEntity[component.name];
+
+        let result = [];
+
+        for (let i = 0; i < directSet.length; i++)
+        {
+            let direct = directSet[i];
+
+            this.FindAllParentsInComposeGraph(direct, direct, result);
+        }
+
+        return result;
+    }
+
+    Query(obj)
+    {
+        if (obj.isEntity)
+        {
+            return this.QueryEntity(obj);
+        }
+        else if (obj.isComponent)
+        {
+            return this.QueryComponent(obj);
+        }
+        else
+        {
+            throw new Error(`Unsupported`);
+        }
     }
 }

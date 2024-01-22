@@ -49,4 +49,24 @@ function test2()
     console.log(repo.Query(MakeEntity("A.B.C.*")));
 }
 
-test2();
+function test3()
+{
+    let repo = new eccg();
+
+    let A = MakeEntity("A");
+    let B = MakeEntity("B");
+    let C = MakeEntity("C");
+    let D = MakeEntity("D");
+
+    let PropC = MakeComponent("Property", "PropertyC");
+
+    repo.Compose(C, PropC);
+
+    repo.Compose(A, B);
+    repo.Compose(B, C);
+    repo.Compose(D, B);
+
+    console.log(repo.Query(MakeComponent("Property")));
+}
+
+test3();
