@@ -190,4 +190,31 @@ export class eccg
             throw new Error(`Unsupported`);
         }
     }
+
+    ToMermaid()
+    {
+        let entitiesAsMermaid = [];
+
+        Object.keys(this.composeGraph).forEach((key) => {
+            let values = this.composeGraph[key];
+
+
+            values.forEach((val) => {
+                if (val.isComponent)
+                {
+                    entitiesAsMermaid.push(`${key}-->${val.name}:${val.value};`);
+                    entitiesAsMermaid.push(`style ${val.name}:${val.value} fill:#08aec4;`);
+                }
+                else if (val.isEntity)
+                {
+                    entitiesAsMermaid.push(`${key}-.->${val.name};`);
+                }
+            })
+
+            entitiesAsMermaid.push(`style ${key} fill:#63c408;`);
+        })
+
+        return `\`\`\`mermaid \n graph TD; \n ${entitiesAsMermaid.join("\n")} \n \`\`\`
+        `;
+    }
 }

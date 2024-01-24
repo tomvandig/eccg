@@ -107,8 +107,8 @@ function test_mads()
 
     repo.Compose(archetypeSpaceArchitect, MakeComponent("Classification", "Room"));
     repo.Compose(archetypeSpaceArchitect, MakeComponent("Geometry", "Extrusion"));
-    repo.Compose(archetypeSpaceArchitect, MakeComponent("Identity", "<undefined>"));
-    repo.Compose(archetypeSpaceArchitect, MakeComponent("Occupancy-Code", "<undefined>"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Identity", "undefined"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Occupancy-Code", "undefined"));
     repo.Compose(archetypeSpaceArchitect, MakeComponent("SpaceType-Functional", "default"));
 
 
@@ -135,12 +135,16 @@ function test_mads()
     repo.Compose(apartmentA01, apartmentTypical);
     repo.Compose(apartmentA02, apartmentTypical);
 
-    repo.Compose(MakeComposedEntity(apartmentA01, archApart), MakeComponent("Identity", "Apartment A-01"));
-    repo.Compose(MakeComposedEntity(apartmentA02, archApart), MakeComponent("Identity", "Apartment A-02"));
+    repo.Compose(MakeComposedEntity(apartmentA01, archApart), MakeComponent("Identity", "Apartment-A-01"));
+    repo.Compose(MakeComposedEntity(apartmentA02, archApart), MakeComponent("Identity", "Apartment-A-02"));
 
     console.log(repo.Query(MakeComponent("SpaceType-Functional")));
-    console.log(repo.Query(MakeEntity("Apartment-A01.*")));
-    console.log(repo.Query(MakeEntity("Apartment-A02.*")));
+    console.log(repo.Query(MakeEntity("Space:Architect.*")).filter((e)=>e.composedObject.isComponent).map((e)=>`${e.entity}: ${e.composedObject.name}: ${e.composedObject.value}`));
+    console.log(repo.Query(MakeEntity("Room.*")).filter((e)=>e.composedObject.isComponent).map((e)=>`${e.entity}: ${e.composedObject.name}: ${e.composedObject.value}`));
+    console.log(repo.Query(MakeEntity("Apartment-A01.*")).filter((e)=>e.composedObject.isComponent).map((e)=>`${e.entity}: ${e.composedObject.name}: ${e.composedObject.value}`));
+    console.log(repo.Query(MakeEntity("Apartment-A02.*")).filter((e)=>e.composedObject.isComponent).map((e)=>`${e.entity}: ${e.composedObject.name}: ${e.composedObject.value}`));
+
+    console.log(repo.ToMermaid());
 }
 
 test_mads();
