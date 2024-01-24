@@ -7,6 +7,14 @@ export function MakeEntity(name)
     };
 }
 
+export function MakeComposedEntity(a, b)
+{
+    return {
+        name: `${a.name}.${b.name}`,
+        isEntity: true
+    };
+}
+
 export function MakeComponent(name, value)
 {
     return {
@@ -68,11 +76,11 @@ export class eccg
         let typeMap = {};
 
         composedOnLeaf.forEach((obj) => {
-            typeMap[obj.name] = obj;
+            typeMap[obj.composedObject.name] = obj;
         })
         
         composedOnPath.forEach((obj) => {
-            typeMap[obj.name] = obj;
+            typeMap[obj.composedObject.name] = obj;
         })
 
         return Object.values(typeMap);
@@ -85,20 +93,25 @@ export class eccg
         let singleEntityInPath = entitiesInPath.length === 1;
 
         let leaf = entitiesInPath[entitiesInPath.length - 1];
-        let currentEntityPath = entitiesInPath.join(".");
 
         let composedOnEntity = this.ShallowQueryEntity(leaf, entity.name);
 
+        // @issue: overrides don't consider subpaths exhaustively
         if (!singleEntityInPath)
         {
-            let composedOnEntityPath = this.ShallowQueryEntity(currentEntityPath, entity.name);
+            for (let i = entitiesInPath.length; i >= 0; i--)
+            {
+                let subpath = entitiesInPath.slice(i, entitiesInPath.length).join(".");
+                let composedOnEntitySubPath = this.ShallowQueryEntity(subpath, entity.name);
 
-            /* 
-                Everything composed on the full entity path overrides what is composed on the leaf.
-                This is how we ensure that specific instances can carry custom component values,
-                without affecting the child entities.
-            */
-            composedOnEntity = this.Override(composedOnEntity, composedOnEntityPath);
+                /* 
+                    Everything composed on the full entity path and all subpaths overrides what is composed on the leaf,
+                    with the largest path taking precedence
+                    This is how we ensure that specific instances can carry custom component values,
+                    without affecting the child entities.
+                */
+                composedOnEntity = this.Override(composedOnEntity, composedOnEntitySubPath);
+            }
         }
 
         if (recursive)

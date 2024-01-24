@@ -9,7 +9,7 @@ It is likely that this structure exists already under a different name or in a n
 An ECCG *could be* a good fit if:
 
 * You need component reuse in an ECS
-* You need to express types through composition in an ECS
+* You need to express typicals or archetypes through composition in an ECS
 
 An ECCG is *not* a good fit if:
 * You have no patterns of component reuse
