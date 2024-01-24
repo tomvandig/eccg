@@ -102,8 +102,8 @@ function test_mads()
 {
     let repo = new eccg();
 
-    let archetypeSpaceArchitect = MakeEntity("Space:Architect");
-    let archetypeSpaceEngineer = MakeEntity("Space:Engineer");
+    let archetypeSpaceArchitect = MakeEntity("Space-Architect");
+    let archetypeSpaceEngineer = MakeEntity("Space-Engineer");
 
     repo.Compose(archetypeSpaceArchitect, MakeComponent("Classification", "Room"));
     repo.Compose(archetypeSpaceArchitect, MakeComponent("Geometry", "Extrusion"));

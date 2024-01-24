@@ -202,8 +202,8 @@ export class eccg
             values.forEach((val) => {
                 if (val.isComponent)
                 {
-                    entitiesAsMermaid.push(`${key}-->${val.name}:${val.value};`);
-                    entitiesAsMermaid.push(`style ${val.name}:${val.value} fill:#08aec4;`);
+                    entitiesAsMermaid.push(`${key}-->${val.name}-${val.value};`);
+                    entitiesAsMermaid.push(`style ${val.name}-${val.value} fill:#08aec4;`);
                 }
                 else if (val.isEntity)
                 {
