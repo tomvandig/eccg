@@ -130,13 +130,17 @@ function test_mads()
     repo.Compose(engApart, MakeComponent("SpaceType-Energy", "Residential"));
 
     let apartmentA01 = MakeEntity("Apartment-A01");
+    let apartmentA02 = MakeEntity("Apartment-A02");
 
     repo.Compose(apartmentA01, apartmentTypical);
+    repo.Compose(apartmentA02, apartmentTypical);
 
-    repo.Compose(MakeComposedEntity(apartmentA01, archApart), MakeComponent("Identity", "Room1"));
+    repo.Compose(MakeComposedEntity(apartmentA01, archApart), MakeComponent("Identity", "Apartment A-01"));
+    repo.Compose(MakeComposedEntity(apartmentA02, archApart), MakeComponent("Identity", "Apartment A-02"));
 
     console.log(repo.Query(MakeComponent("SpaceType-Functional")));
     console.log(repo.Query(MakeEntity("Apartment-A01.*")));
+    console.log(repo.Query(MakeEntity("Apartment-A02.*")));
 }
 
 test_mads();
