@@ -64,22 +64,23 @@ export class eccg
         return result ? result.map((obj) => { return { entity: path, composedObject: obj}; }) : [];
     }
 
-    QueryEntity(entity, path, recursive)
+    QueryEntity(entity, recursive)
     {
         console.log(`query entity ${entity.name} ${recursive ? "recursive" : ""}`);
-        let parts = entity.name.split(".");
+        let entitiesInPath = entity.name.split(".");
 
-        let singlePart = parts.length === 1;
+        let singleEntityInPath = entitiesInPath.length === 1;
 
-        let main = parts[parts.length - 1];
-        let secondary = parts.join(".");
+        let leaf = entitiesInPath[entitiesInPath.length - 1];
+        let currentEntityPath = entitiesInPath.join(".");
 
-        let results = this.ShallowQueryEntity(main, path);
+        let results = this.ShallowQueryEntity(leaf, entity.name);
 
-        if (!singlePart)
+        if (!singleEntityInPath)
         {
-            let secondaryShallow = this.ShallowQueryEntity(secondary, path);
-            results.push(...secondaryShallow);
+            // here we should potentially do overrides on current results with what we find on the virtual entity
+            let currentEntityPathShallow = this.ShallowQueryEntity(currentEntityPath, entity.name);
+            results.push(...currentEntityPathShallow);
         }
 
         if (recursive)
@@ -89,10 +90,10 @@ export class eccg
             resultsCpy.forEach(element => {
                 if (element.composedObject.isEntity)
                 {
-                    let virtual = MakeEntity(`${element.entity}.${element.composedObject.name}`);
-                    let virtualResults = this.QueryEntity(virtual, virtual.name, true);
+                    let childEntity = MakeEntity(`${element.entity}.${element.composedObject.name}`);
+                    let childResults = this.QueryEntity(childEntity, true);
                     
-                    results.push(...virtualResults);
+                    results.push(...childResults);
                 }
             });
             console.log(`...end expand`);
@@ -146,7 +147,7 @@ export class eccg
         {
             let stripped = this.StripQueryWildCard(obj.name);
             let recursive = stripped.split(".").length !== obj.name.split(".").length;
-            return this.QueryEntity(MakeEntity(stripped), stripped, recursive);
+            return this.QueryEntity(MakeEntity(stripped), recursive);
         }
         else if (obj.isComponent)
         {
