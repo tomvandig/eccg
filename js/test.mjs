@@ -1,4 +1,4 @@
-import { MakeComponent, MakeEntity, eccg } from "./eccg.mjs";
+import { MakeComponent, MakeEntity, MakeComposedEntity, eccg } from "./eccg.mjs";
 
 function test()
 {
@@ -98,4 +98,45 @@ function testaec()
     console.log(repo.Query(MakeEntity("SpaceHeater2.ConvectionHeater.EnergyTransferArchetype.*")));
 }
 
-testaec();
+function test_mads()
+{
+    let repo = new eccg();
+
+    let archetypeSpaceArchitect = MakeEntity("Space:Architect");
+    let archetypeSpaceEngineer = MakeEntity("Space:Engineer");
+
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Classification", "Room"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Geometry", "Extrusion"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Identity", "<undefined>"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("Occupancy-Code", "<undefined>"));
+    repo.Compose(archetypeSpaceArchitect, MakeComponent("SpaceType-Functional", "default"));
+
+
+    repo.Compose(archetypeSpaceEngineer, MakeComponent("Occupancy-Energy", "A-01"));
+    repo.Compose(archetypeSpaceEngineer, MakeComponent("SpaceType-Energy", "default"));
+
+    let apartmentTypical = MakeEntity("Room");
+
+    repo.Compose(apartmentTypical, archetypeSpaceArchitect);
+    repo.Compose(apartmentTypical, archetypeSpaceEngineer);
+
+    let archApart = MakeComposedEntity(apartmentTypical, archetypeSpaceArchitect);
+    let engApart = MakeComposedEntity(apartmentTypical, archetypeSpaceEngineer);
+
+    repo.Compose(archApart, MakeComponent("Occupancy-Code", "Z1"));
+    repo.Compose(archApart, MakeComponent("SpaceType-Functional", "Apartment"));
+
+    repo.Compose(engApart, MakeComponent("Occupancy-Energy", "A-03"));
+    repo.Compose(engApart, MakeComponent("SpaceType-Energy", "Residential"));
+
+    let apartmentA01 = MakeEntity("Apartment-A01");
+
+    repo.Compose(apartmentA01, apartmentTypical);
+
+    repo.Compose(MakeComposedEntity(apartmentA01, archApart), MakeComponent("Identity", "Room1"));
+
+    console.log(repo.Query(MakeComponent("SpaceType-Functional")));
+    console.log(repo.Query(MakeEntity("Apartment-A01.*")));
+}
+
+test_mads();
