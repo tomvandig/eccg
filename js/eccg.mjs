@@ -59,14 +59,27 @@ export class eccg
 
     ShallowQueryEntity(name, path)
     {
-        console.log(`query shallow entity ${name}`);
         let result = this.composeGraph[name];
         return result ? result.map((obj) => { return { entity: path, composedObject: obj}; }) : [];
     }
 
+    Override(composedOnLeaf, composedOnPath)
+    {
+        let typeMap = {};
+
+        composedOnLeaf.forEach((obj) => {
+            typeMap[obj.name] = obj;
+        })
+        
+        composedOnPath.forEach((obj) => {
+            typeMap[obj.name] = obj;
+        })
+
+        return Object.values(typeMap);
+    }
+
     QueryEntity(entity, recursive)
     {
-        console.log(`query entity ${entity.name} ${recursive ? "recursive" : ""}`);
         let entitiesInPath = entity.name.split(".");
 
         let singleEntityInPath = entitiesInPath.length === 1;
@@ -74,46 +87,49 @@ export class eccg
         let leaf = entitiesInPath[entitiesInPath.length - 1];
         let currentEntityPath = entitiesInPath.join(".");
 
-        let results = this.ShallowQueryEntity(leaf, entity.name);
+        let composedOnEntity = this.ShallowQueryEntity(leaf, entity.name);
 
         if (!singleEntityInPath)
         {
-            // here we should potentially do overrides on current results with what we find on the virtual entity
-            let currentEntityPathShallow = this.ShallowQueryEntity(currentEntityPath, entity.name);
-            results.push(...currentEntityPathShallow);
+            let composedOnEntityPath = this.ShallowQueryEntity(currentEntityPath, entity.name);
+
+            /* 
+                Everything composed on the full entity path overrides what is composed on the leaf.
+                This is how we ensure that specific instances can carry custom component values,
+                without affecting the child entities.
+            */
+            composedOnEntity = this.Override(composedOnEntity, composedOnEntityPath);
         }
 
         if (recursive)
         {
-            console.log(`expand...`);
-            let resultsCpy = [...results];
+            let resultsCpy = [...composedOnEntity];
             resultsCpy.forEach(element => {
                 if (element.composedObject.isEntity)
                 {
                     let childEntity = MakeEntity(`${element.entity}.${element.composedObject.name}`);
                     let childResults = this.QueryEntity(childEntity, true);
                     
-                    results.push(...childResults);
+                    composedOnEntity.push(...childResults);
                 }
             });
-            console.log(`...end expand`);
         }
 
-        return results;
+        return composedOnEntity;
     }
 
     FindAllParentsInComposeGraph(entity, entityPath, result)
     {
-        result.push(entityPath);
+        result[entityPath] = true;
 
         let invSet = this.invComposeGraph[entity];
 
         if (invSet)
         {
             invSet.forEach((inv) => {
-                let virtual = `${inv}.${entityPath}`;
+                let child = `${inv}.${entityPath}`;
 
-                this.FindAllParentsInComposeGraph(inv, virtual, result)
+                this.FindAllParentsInComposeGraph(inv, child, result)
             })
         }
     }
@@ -124,7 +140,8 @@ export class eccg
 
         if (!directSet) return [];
 
-        let result = [];
+        // we use a map to prevent duplicate paths in the return value
+        let result = {};
 
         for (let i = 0; i < directSet.length; i++)
         {
@@ -133,7 +150,7 @@ export class eccg
             this.FindAllParentsInComposeGraph(direct, direct, result);
         }
 
-        return result;
+        return Object.keys(result);
     }
 
     StripQueryWildCard(name)
@@ -145,12 +162,14 @@ export class eccg
     {
         if (obj.isEntity)
         {
+            console.log(`Query entity ${obj.name}`)
             let stripped = this.StripQueryWildCard(obj.name);
             let recursive = stripped.split(".").length !== obj.name.split(".").length;
             return this.QueryEntity(MakeEntity(stripped), recursive);
         }
         else if (obj.isComponent)
         {
+            console.log(`Query component ${obj.name}`)
             return this.QueryComponent(obj);
         }
         else

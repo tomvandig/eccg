@@ -80,11 +80,13 @@ function testaec()
 
     let Name1 = MakeComponent("Name", "SpaceHeater1");
     let Name2 = MakeComponent("Name", "SpaceHeater2");
-    let HeatingCoefficient = MakeComponent("HeatingCoefficient", "382 mg/s");
+    let HeatingCoefficient = MakeComponent("HeatingCoefficient", "default: 382 mg/s");
+    let HeatingCoefficientOverride = MakeComponent("HeatingCoefficient", "overridden: 235 mg/s");
 
     repo.Compose(EnergyTransferArchetype, HeatingCoefficient);
     repo.Compose(SpaceHeater1, Name1);
     repo.Compose(SpaceHeater2, Name2);
+    repo.Compose(MakeEntity("SpaceHeater1.ConvectionHeater.EnergyTransferArchetype"), HeatingCoefficientOverride);
 
     repo.Compose(SpaceHeater1, ConvectionHeater);
     repo.Compose(SpaceHeater2, ConvectionHeater);
@@ -93,6 +95,7 @@ function testaec()
     console.log(repo.Query(MakeComponent("HeatingCoefficient")));
     console.log(repo.Query(MakeEntity("SpaceHeater1.*")));
     console.log(repo.Query(MakeEntity("SpaceHeater1.ConvectionHeater.EnergyTransferArchetype.*")));
+    console.log(repo.Query(MakeEntity("SpaceHeater2.ConvectionHeater.EnergyTransferArchetype.*")));
 }
 
 testaec();
